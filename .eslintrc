@@ -1,0 +1,11 @@
+{
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "quotes": [2, "single"],
+    "no-console": 0,
+    "semi": 2
+  },
+  "extends": "eslint:recommended"
+}

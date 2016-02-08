@@ -1,0 +1,30 @@
+{
+  "name": "toggl-to-tripletex",
+  "version": "1.0.0",
+  "description": "Automating my timesheet filling",
+  "main": "index.js",
+  "dependencies": {
+    "casperjs": "^1.1.0-beta5",
+    "moment": "^2.11.1",
+    "phantomjs-prebuilt": "^2.1.4",
+    "toggl-api": "^0.0.4"
+  },
+  "devDependencies": {
+    "eslint": "^1.10.3"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "npm run lint && mocha",
+    "lint": "eslint . "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eiriksm/toggl-to-tripletex.git"
+  },
+  "author": "Eirik S. Morland <eirik@morland.no>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eiriksm/toggl-to-tripletex/issues"
+  },
+  "homepage": "https://github.com/eiriksm/toggl-to-tripletex#readme"
+}

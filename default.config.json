@@ -1,0 +1,14 @@
+{
+  "apiKey": "YOUR-TOGGL-API-KEY",
+  "texUser": "you@your-company.com",
+  "texPass": "YOURTRIPPYTEXPASSWORD",
+  "mappings": {
+    "TOGGL-PID": {
+      "name": "The title of the project in tripletex",
+      "id": "the-numeric-id-of-the-project"
+    }
+  },
+  "activityMappings": {
+    "toggl-tag": "numeric activity id"
+  }
+}
