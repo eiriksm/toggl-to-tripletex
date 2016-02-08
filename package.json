@@ -5,12 +5,15 @@
   "main": "index.js",
   "dependencies": {
     "casperjs": "^1.1.0-beta5",
-    "moment": "^2.11.1",
+    "moment": "^2.11.2",
     "phantomjs-prebuilt": "^2.1.4",
     "toggl-api": "^0.0.4"
   },
   "devDependencies": {
-    "eslint": "^1.10.3"
+    "coveralls": "^2.11.6",
+    "eslint": "^1.10.3",
+    "istanbul": "^0.4.2",
+    "mocha": "^2.4.5"
   },
   "scripts": {
     "start": "node index.js",
