@@ -14,9 +14,13 @@ module.exports = function() {
     data.forEach(function(n) {
       var m = mappings[n.pid];
       if (!m) {
+        console.log(n);
         throw new Error('No mapping for activity. Activity text was: ' + n.description);
       }
       var duration = Number((Math.round((n.duration / 3600) * 4) / 4).toFixed(2));
+      if (!config.activityMappings[n.tags[0]]) {
+        throw new Error('No mapping found for toggl tag ' + n.tags[0]);
+      }
       var key = '' + m.id + config.activityMappings[n.tags[0]];
       if (!entries[key]) {
         entries[key] = {
