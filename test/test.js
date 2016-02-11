@@ -67,6 +67,20 @@ describe('End to end', function() {
     });
     ttt.should.throw('No mapping for activity. Activity text was: Test description');
   });
+  it('Should throw without toggl tag mappings', function() {
+    var ttt = proxyquire('..', {
+      'toggl-api': mockToggl,
+      './config': {
+        mappings: {
+          456: {
+            name: 'test project',
+            id: 1
+          }
+        }
+      }
+    });
+    ttt.should.throw('No mapping found for toggl tag bug fixing');
+  });
   it('Should start spawn with the expected params', function() {
     var ttt = proxyquire('..', {
       'toggl-api': mockToggl,
