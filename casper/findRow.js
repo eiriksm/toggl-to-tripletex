@@ -13,5 +13,9 @@ module.exports = function(casper) {
     }, en.id, en.name, en.activity);
     logger('Has row is ' + hr);
     hfr = hr;
+    return {
+      hasRow: hr,
+      hasFirstRow: hfr
+    };
   };
-}
+};
