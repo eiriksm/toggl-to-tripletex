@@ -100,7 +100,7 @@ describe('End to end', function() {
       }
     });
     ttt();
-    mySpawn.calls[0].args[0].should.equal('poster.js');
+    mySpawn.calls[0].args[0].should.equal('casper/poster.js');
     JSON.parse(mySpawn.calls[0].args[1]).entries.should.eql({ '110':
       { id: 1,
         name: 'test project',
