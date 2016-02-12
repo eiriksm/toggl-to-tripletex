@@ -6,6 +6,7 @@ var toggl = new TogglClient({apiToken: config.apiKey});
 var mo = require('moment');
 var entries = {};
 var mappings = config.mappings;
+var totalDuration = 0;
 module.exports = function() {
   toggl.getTimeEntries(mo(1, 'h').format(), mo(19, 'h').format(), function(err, data) {
     if (err) {
@@ -38,13 +39,15 @@ module.exports = function() {
         /* eslint-enable quotes */
         entries[key].usedText[n.description] = true;
       }
-      entries[key].duration = entries[key].duration + duration;
+      entries[key].duration = entries[key].duration + duration, 10;
+      totalDuration = totalDuration + duration;
     });
     // Spawn a process with this as arguments.
-    var p = spawn('casperjs', ['poster.js', JSON.stringify({
+    var p = spawn('casperjs', ['casper/poster.js', JSON.stringify({
       entries: entries,
       user: config.texUser,
-      pass: config.texPass
+      pass: config.texPass,
+      duration: totalDuration
     })]);
     p.stdout.on('data', function(data) {
       console.log(data.toString());

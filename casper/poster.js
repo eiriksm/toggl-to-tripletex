@@ -19,13 +19,7 @@ var user = opts.user;
 var pass = opts.pass;
 var counter = 0;
 
-function logger(str, sev) {
-  if (!sev) {
-    sev = 'INFO';
-  }
-  str = new Date().toString() + ':' + str;
-  casper.echo(str, sev);
-}
+var logger = require('./logger')(casper);
 
 function pad(num, size) {
   var s = '000000000' + num;
@@ -66,20 +60,7 @@ function logEntryAndScreenshot(text, file, severity) {
 function createRun(entry) {
   var hasRow = false;
   var hasFirstRow = false;
-  casper.then(function(en) {
-    hasRow = casper.evaluate(function(id, name, activity) {
-      var hasNext = false;
-      jQuery('td a[title="' + id + ' ' + name + '"]').each(function() {
-        if ($(this).closest('td').next().text().indexOf(activity) === 0) {
-          hasNext = true;
-        }
-      });
-      return jQuery('td a[title="' + id + ' ' + name + '"]').length > 0 &&
-        hasNext;
-    }, en.id, en.name, en.activity);
-    logger('Has row is ' + hasRow);
-    hasFirstRow = hasRow;
-  }.bind(this, entry));
+  casper.then(require('./findRow')(casper).bind(this, entry));
   casper.then(function() {
     // If we don't know the row, we must create it.
     if (!hasRow) {
@@ -230,4 +211,15 @@ casper.waitForSelector('#logoutButton', function() {
 for (var i in opts.entries) {
   createRun(opts.entries[i]);
 }
+
+casper.then(function() {
+  // Try to compare what we tried to save to what we have saved.
+  var hours = casper.evaluate(function() {
+    return parseFloat($($('#ajaxContenthourListTable tr:eq(-1)').find('.hourlistSum')[4]).text().replace(',', '.'));
+  });
+  if (hours != opts.duration) {
+    logger('Did not save all hours, unfortunately. I am a bad robot, sorry!');
+    casper.exit(1);
+  }
+});
 casper.run();
