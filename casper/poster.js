@@ -215,10 +215,11 @@ for (var i in opts.entries) {
 casper.then(function() {
   // Try to compare what we tried to save to what we have saved.
   var hours = casper.evaluate(function() {
-    return parseFloat($($('#ajaxContenthourListTable tr:eq(-1)').find('.hourlistSum')[4]).text().replace(',', '.'));
+    var day = new Date().getDay() - 1;
+    return parseFloat($($('#ajaxContenthourListTable tr:eq(-1)').find('.hourlistSum')[day]).text().replace(',', '.'));
   });
   if (hours != opts.duration) {
-    logger('Did not save all hours, unfortunately. I am a bad robot, sorry!');
+    logger('Did not save all hours, unfortunately. I am a bad robot, sorry! Duration sent was ' + opts.duration + '. Saved hours was ' + hours);
     casper.exit(1);
   }
 });

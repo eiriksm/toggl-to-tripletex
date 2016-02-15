@@ -19,6 +19,9 @@ module.exports = function() {
         throw new Error('No mapping for activity. Activity text was: ' + n.description);
       }
       var duration = Number((Math.round((n.duration / 3600) * 4) / 4).toFixed(2));
+      if (!n.tags || !n.tags.length) {
+        throw new Error('No tag supplied for activity: ' + n.description);
+      }
       if (!config.activityMappings[n.tags[0]]) {
         throw new Error('No mapping found for toggl tag ' + n.tags[0]);
       }
