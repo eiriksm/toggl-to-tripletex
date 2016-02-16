@@ -3,8 +3,8 @@ module.exports = function(casper) {
     if (!sev) {
       sev = 'INFO';
     }
-    str = new Date().toString() + ':' + str;
-    casper.echo(str, sev);
+    str = '[' + sev + '] ' + new Date().toString() + ': ' + str;
+    casper.echo(str);
   }
   return logger;
 };
