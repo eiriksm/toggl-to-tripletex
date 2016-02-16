@@ -58,36 +58,24 @@ function logEntryAndScreenshot(text, file, severity) {
 }
 
 function createRun(entry) {
-  var hasRow = false;
-  var hasFirstRow = false;
-  casper.then(require('./findRow')(casper).bind(this, entry));
-  casper.then(function() {
-    // If we don't know the row, we must create it.
-    if (!hasRow) {
-      logger('Trying to insert a new row');
-      casper.evaluate(function() {
-        $('th button').click();
-      });
-    }
-    else {
-      logger('Have row in current screen');
-    }
-  }.bind(this, entry));
+  var state = {};
+  casper.then(require('./findRow')(casper).bind(this, entry, state));
+  casper.then(require('./createRowIfNotExists')(casper).bind(this, state));
   casper.waitFor(function() {
-    return hasRow || casper.evaluate(function() {
+    return state.hasRow || casper.evaluate(function() {
       return $($('.contentTable > .newWeeks')[0]).css('display') != 'none';
     });
   }, function then(en) {
-    clickDropdown(en, 'project', hasRow);
+    clickDropdown(en, 'project', state.hasRow);
   }.bind(this, entry), function timeout(en) {
     logEntryAndScreenshot('No dropdown found to click!', 'waitForDropdownError' + en.id + '-' + en.activity);
   }.bind(this, entry));
   casper.waitFor(function check() {
-    return hasRow || casper.evaluate(function() {
+    return state.hasRow || casper.evaluate(function() {
       return $('.tlxSelectListTable tr').length > 0;
     });
   }, function then(en) {
-    if (!hasRow) {
+    if (!state.hasRow) {
       logger('Done waiting for project list');
       screenShot('projectList' + en.id + '-' + en.activity);
       // Click the row with the text of this project.
@@ -104,14 +92,14 @@ function createRun(entry) {
     logEntryAndScreenshot('Timed out waiting for the project list', 'listtimeout' + en.id + '-' + en.activity, 'ERROR');
   }.bind(this, entry), 10000);
   casper.then(function(en) {
-    clickDropdown(en, 'activity', hasRow);
+    clickDropdown(en, 'activity', state.hasRow);
   }.bind(this, entry));
   casper.waitFor(function check() {
-    return hasRow || casper.evaluate(function() {
+    return state.hasRow || casper.evaluate(function() {
       return $('.tlxSelectListTable tr').length > 0;
     });
   }, function then(en) {
-    if (!hasRow) {
+    if (!state.hasRow) {
       if (en.activity != 1) {
         logger('Will try to click on the activity list');
         // Add the activity requested. Unless it is 1 (default).
@@ -126,19 +114,19 @@ function createRun(entry) {
       else {
         logger('Using default activity, because activity is ' + en.activity);
       }
-      hasRow = true;
+      state.hasRow = true;
     }
   }.bind(this, entry), function timeout(en) {
     logEntryAndScreenshot('Timed out waiting for activity list', 'activitywaittimeout' + en.id + '-' + en.activity, 'ERROR');
   }.bind(this, entry), 10000);
   casper.then(function(en) {
-    if (hasRow) {
+    if (state.hasRow) {
       // Insert the hours on the current day. Which is 3 for monday and so on.
       // Since I don't usually work on sundays, that means new Date().getDay()
       // + 2.
       logger('Trying to fill in hour for ' + en.name);
-      logger('hasFirstRow is ' + hasFirstRow);
-      if (hasFirstRow) {
+      logger('hasFirstRow is ' + state.hasFirstRow);
+      if (state.hasFirstRow) {
         casper.evaluate(function(id, name, activity, hours, text) {
           var delta = new Date().getDay() + 2;
           jQuery('td a[title="' + id + ' ' + name + '"]').each(function(j, k) {
