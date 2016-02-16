@@ -2,7 +2,11 @@
 var proxyquire =  require('proxyquire');
 var mockSpawn = require('mock-spawn');
 var mySpawn = mockSpawn();
-mySpawn.setDefault(mySpawn.simple(1, 'test', 'test2'));
+mySpawn.setDefault(mySpawn.simple(1, '', 'test', 'test2'));
+mySpawn.sequence.add(function (cb) {
+  this.stdout.write('a');
+  cb();
+});
 require('should');
 
 var mockData = [
@@ -50,22 +54,50 @@ describe('Module export', function() {
     var ttt = proxyquire('..', {
       'toggl-api': mockToggl
     });
-    ttt.should.throw(new Error('mock it'));
+    ttt(function(err) {
+      err.should.eql(new Error('mock it'));
+    });
   });
 });
 
 describe('End to end', function() {
+  it('Should throw when there is activites without tags', function() {
+    mockProcess = function(from, to, cb) {
+      cb(null, [
+        {
+          id: 123,
+          pid: 456,
+          duration: 1,
+          description: 'Test without tag'
+        }
+      ]);
+    };
+    proxyquire('..', {
+      'toggl-api': mockToggl,
+      './config': {
+        mappings: {
+          456: {
+            name: 'test project',
+            id: 1
+          }
+        }
+      }
+    })(function(err) {
+      err.should.eql(new Error('No tag supplied for activity: Test without tag'));
+    });
+  });
   it('Should throw without mappings', function() {
     mockProcess = function(from, to, cb) {
       cb(null, mockData);
     };
-    var ttt = proxyquire('..', {
+    proxyquire('..', {
       'toggl-api': mockToggl,
       './config': {
         mappings: {}
       }
+    })(function(err) {
+      err.should.eql(new Error('No mapping for activity. Activity text was: Test description'));
     });
-    ttt.should.throw('No mapping for activity. Activity text was: Test description');
   });
   it('Should throw without toggl tag mappings', function() {
     var ttt = proxyquire('..', {
@@ -79,9 +111,11 @@ describe('End to end', function() {
         }
       }
     });
-    ttt.should.throw('No mapping found for toggl tag bug fixing');
+    ttt(function(err) {
+      err.should.eql(new Error('No mapping found for toggl tag bug fixing'));
+    });
   });
-  it('Should start spawn with the expected params', function() {
+  it('Should throw when exit code is 1', function(done) {
     var ttt = proxyquire('..', {
       'toggl-api': mockToggl,
       'child_process': mockChildProcess,
@@ -99,15 +133,50 @@ describe('End to end', function() {
         texPass: 'testPass'
       }
     });
-    ttt();
-    mySpawn.calls[0].args[0].should.equal('casper/poster.js');
-    JSON.parse(mySpawn.calls[0].args[1]).entries.should.eql({ '110':
-      { id: 1,
-        name: 'test project',
-        activity: 10,
-        duration: 3,
-        text: 'Test description 2\nTest description\n',
-        usedText: { 'Test description': true, 'Test description 2': true } } }
-    );
+    ttt(function(err) {
+      mySpawn.calls[0].args[0].should.equal('casper/poster.js');
+      JSON.parse(mySpawn.calls[0].args[1]).entries.should.eql({ '110':
+        { id: 1,
+          name: 'test project',
+          activity: 10,
+          duration: 3,
+          text: 'Test description 2\nTest description\n',
+          usedText: { 'Test description': true, 'Test description 2': true } } }
+      );
+      done();
+      err.should.eql(new Error('Problematic run detected'));
+    });
+  });
+  it('Should start spawn with the expected params', function(done) {
+    mySpawn.setDefault(mySpawn.simple(0, '', 'test', 'test2'));
+    var ttt = proxyquire('..', {
+      'toggl-api': mockToggl,
+      'child_process': mockChildProcess,
+      './config': {
+        mappings: {
+          456: {
+            name: 'test project',
+            id: 1
+          }
+        },
+        activityMappings: {
+          'bug fixing': 10
+        },
+        texUser: 'test@test.com',
+        texPass: 'testPass'
+      }
+    });
+    ttt(function(err) {
+      mySpawn.calls[0].args[0].should.equal('casper/poster.js');
+      JSON.parse(mySpawn.calls[0].args[1]).entries.should.eql({ '110':
+        { id: 1,
+          name: 'test project',
+          activity: 10,
+          duration: 3,
+          text: 'Test description 2\nTest description\n',
+          usedText: { 'Test description': true, 'Test description 2': true } } }
+      );
+      done(err);
+    });
   });
 });

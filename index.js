@@ -7,23 +7,28 @@ var mo = require('moment');
 var entries = {};
 var mappings = config.mappings;
 var totalDuration = 0;
-module.exports = function() {
+module.exports = function(callback) {
   toggl.getTimeEntries(mo(1, 'h').format(), mo(19, 'h').format(), function(err, data) {
     if (err) {
-      throw new Error(err);
+      return callback(err);
     }
+    var error = false;
     data.forEach(function(n) {
+      if (error) {
+        return;
+      }
       var m = mappings[n.pid];
       if (!m) {
         console.log(n);
-        throw new Error('No mapping for activity. Activity text was: ' + n.description);
+        error = new Error('No mapping for activity. Activity text was: ' + n.description);
+        return;
       }
       var duration = Number((Math.round((n.duration / 3600) * 4) / 4).toFixed(2));
       if (!n.tags || !n.tags.length) {
-        throw new Error('No tag supplied for activity: ' + n.description);
+        return callback(new Error('No tag supplied for activity: ' + n.description));
       }
       if (!config.activityMappings[n.tags[0]]) {
-        throw new Error('No mapping found for toggl tag ' + n.tags[0]);
+        return callback(new Error('No mapping found for toggl tag ' + n.tags[0]));
       }
       var key = '' + m.id + config.activityMappings[n.tags[0]];
       if (!entries[key]) {
@@ -45,6 +50,10 @@ module.exports = function() {
       entries[key].duration = entries[key].duration + duration, 10;
       totalDuration = totalDuration + duration;
     });
+    if (error) {
+      callback(error);
+      return;
+    }
     // Spawn a process with this as arguments.
     var p = spawn('casperjs', ['casper/poster.js', JSON.stringify({
       entries: entries,
@@ -52,14 +61,23 @@ module.exports = function() {
       pass: config.texPass,
       duration: totalDuration
     })]);
+    var output = [];
     p.stdout.on('data', function(data) {
-      console.log(data.toString());
+      output.push(data.toString());
     });
     p.stderr.on('data', function(d) {
-      console.log('err', d.toString());
+      output.push('err: ' + d.toString());
     });
     p.on('close', function(c) {
-      console.log('close', c);
+      if (c !== 0) {
+        /* eslint-disable quotes */
+        process.stderr.write(output.join("\n"));
+        callback(new Error('Problematic run detected'));
+        /* eslint-enable quotes */
+      }
+      else {
+        callback();
+      }
     });
 
   });
