@@ -168,7 +168,7 @@ describe('End to end', function() {
     });
     ttt(function(err) {
       mySpawn.calls[0].args[0].should.equal('casper/poster.js');
-      JSON.parse(mySpawn.calls[0].args[1]).entries.should.eql({ '110':
+      JSON.parse(mySpawn.calls[1].args[1]).entries.should.eql({ '110':
         { id: 1,
           name: 'test project',
           activity: 10,
@@ -176,6 +176,46 @@ describe('End to end', function() {
           text: 'Test description 2\nTest description\n',
           usedText: { 'Test description': true, 'Test description 2': true } } }
       );
+      done(err);
+    });
+  });
+  it('Should sum things in the expected way', function(done) {
+    mockData = [
+      { id: 123,
+        pid: 456,
+        duration: 300,
+        description: 'Test description',
+        tags: [ 'bug fixing' ]
+      },
+      { id: 123,
+        pid: 456,
+        duration: 300,
+        description: 'Test description',
+        tags: [ 'bug fixing' ]
+      }
+    ];
+    mockProcess = function(from, to, cb) {
+      cb(null, mockData);
+    };
+    var ttt = proxyquire('..', {
+      'toggl-api': mockToggl,
+      'child_process': mockChildProcess,
+      './config': {
+        mappings: {
+          456: {
+            name: 'test project',
+            id: 1
+          }
+        },
+        activityMappings: {
+          'bug fixing': 10
+        },
+        texUser: 'test@test.com',
+        texPass: 'testPass'
+      }
+    });
+    ttt(function(err) {
+      JSON.parse(mySpawn.calls[2].args[1]).duration.should.equal(0.25);
       done(err);
     });
   });

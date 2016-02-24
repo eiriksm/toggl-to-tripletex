@@ -23,7 +23,6 @@ module.exports = function(callback) {
         error = new Error('No mapping for activity. Activity text was: ' + n.description);
         return;
       }
-      var duration = Number((Math.round((n.duration / 3600) * 4) / 4).toFixed(2));
       if (!n.tags || !n.tags.length) {
         return callback(new Error('No tag supplied for activity: ' + n.description));
       }
@@ -47,8 +46,12 @@ module.exports = function(callback) {
         /* eslint-enable quotes */
         entries[key].usedText[n.description] = true;
       }
-      entries[key].duration = entries[key].duration + duration, 10;
-      totalDuration = totalDuration + duration;
+      entries[key].duration = entries[key].duration + n.duration;
+    });
+    Object.keys(entries).forEach(function(n) {
+      var item = entries[n];
+      entries[n].duration = Number((Math.ceil((item.duration / 3600) * 4) / 4).toFixed(2));
+      totalDuration = totalDuration + entries[n].duration;
     });
     if (error) {
       callback(error);
