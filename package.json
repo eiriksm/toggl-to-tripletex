@@ -6,7 +6,7 @@
   "dependencies": {
     "casperjs": "^1.1.0-beta5",
     "moment": "^2.11.2",
-    "phantomjs-prebuilt": "^2.1.4",
+    "phantomjs-prebuilt": "^2.1.7",
     "toggl-api": "^0.0.4"
   },
   "devDependencies": {
