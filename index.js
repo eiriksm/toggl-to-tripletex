@@ -2,6 +2,7 @@
 var spawn = require('child_process').spawn;
 var config = require('./config');
 var TogglClient = require('toggl-api');
+var rimraf = require('rimraf');
 var toggl = new TogglClient({apiToken: config.apiKey});
 var mo = require('moment');
 var entries = {};
@@ -79,7 +80,7 @@ module.exports = function(callback) {
         /* eslint-enable quotes */
       }
       else {
-        callback();
+        rimraf(__dirname + '/shots/*.png', callback);
       }
     });
 
