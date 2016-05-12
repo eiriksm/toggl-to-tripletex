@@ -59,6 +59,7 @@ function logEntryAndScreenshot(text, file, severity) {
 }
 
 function createRun(entry) {
+  logger('Creating run for object: ' + JSON.stringify(entry));
   var state = {};
   casper.then(require('./findRow')(casper).bind(this, entry, state));
   casper.then(require('./createRowIfNotExists')(casper).bind(this, state));
