@@ -127,10 +127,10 @@ function createRun(entry) {
       logger('Trying to fill in hour for ' + en.name);
       logger('hasFirstRow is ' + state.hasFirstRow);
       if (state.hasFirstRow) {
-        casper.evaluate(function(id, name, activity, hours, text) {
+        casper.evaluate(function(selector, activity, hours, text) {
           var delta = new Date().getDay() + 2;
-          jQuery('td a[title="' + id + ' ' + name + '"]').each(function(j, k) {
-            if ($(k).closest('td').next().text().indexOf(activity) === 0) {
+          jQuery(selector).each(function(j, k) {
+            if ($(k).closest('td').next().text().trimLeft().indexOf(activity) === 0) {
               var textInput = $($(k).closest('tr').find('td')[delta]).find('input[type="text"]');
               textInput.focus();
               textInput.val(hours)
@@ -140,7 +140,7 @@ function createRun(entry) {
                 .blur();
             }
           });
-        }, en.id, en.name, en.activity, en.duration, en.text);
+        }, state.selector, en.activity, en.duration, en.text);
       }
       else {
         casper.evaluate(function(id, name, activity, hours, text) {
