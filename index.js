@@ -63,13 +63,22 @@ module.exports = function(callback) {
       entries: entries,
       user: config.texUser,
       pass: config.texPass,
-      duration: totalDuration
+      duration: totalDuration,
+      baseUrl: config.baseUrl
     })]);
     var output = [];
     p.stdout.on('data', function(data) {
-      output.push(data.toString());
+      var stdOutString = data.toString().trim();
+      if (!stdOutString || !stdOutString.length) {
+        return;
+      }
+      output.push(stdOutString);
     });
     p.stderr.on('data', function(d) {
+      var stdErrString = d.toString().trim();
+      if (!stdErrString || !stdErrString.length) {
+        return;
+      }
       output.push('err: ' + d.toString());
     });
     p.on('close', function(c) {
