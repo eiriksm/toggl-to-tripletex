@@ -8,18 +8,18 @@ var casper = require('casper').create({
   //,verbose: true,
   //logLevel: "debug"
 });
-casper.on('page.error', function(msg) {
-  this.echo('Error: ' + msg, 'ERROR');
-});
-casper.on('remote.message', function(d) {
-  console.log(d);
-});
 var opts = JSON.parse(casper.cli.args[0]);
 var user = opts.user;
 var pass = opts.pass;
 var counter = 0;
 
 var logger = require('./logger')(casper);
+casper.on('page.error', function(msg) {
+  logger('Error from browser: ' + msg, 'ERROR');
+});
+casper.on('remote.message', function(d) {
+  logger('console.log from browser: ' + d);
+});
 
 function pad(num, size) {
   var s = '000000000' + num;
