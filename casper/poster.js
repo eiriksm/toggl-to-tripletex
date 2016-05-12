@@ -27,13 +27,14 @@ function pad(num, size) {
 }
 
 function screenShot(name) {
-  name = pad(counter, 2) + name;
+  name = pad(counter, 2) + '-' + name;
   logger('Capturing screenshot named ' + name);
+  logger('Screenshot at ' + opts.baseUrl + '/' + name + '.png');
   casper.capture('shots/' + name + '.png', {
     top: 0,
     left: 0,
-    width: 800,
-    height: 800
+    width: 1024,
+    height: 1800
   });
   counter++;
 }
