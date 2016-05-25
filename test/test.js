@@ -103,7 +103,8 @@ describe('End to end', function() {
       err.should.eql(new Error('No mapping for activity. Activity text was: Test description'));
     });
   });
-  it('Should throw without toggl tag mappings', function() {
+  it('Should throw without toggl tag mappings', function(done) {
+    var d = false;
     var ttt = proxyquire('..', {
       'toggl-api': mockToggl,
       './config': {
@@ -116,7 +117,13 @@ describe('End to end', function() {
       }
     });
     ttt(function(err) {
+      // Since we re-use the stream thing, just see if we are done or not.
+      if (d) {
+        return;
+      }
+      d = true;
       err.should.eql(new Error('No mapping found for toggl tag bug fixing'));
+      done();
     });
   });
   it('Should throw when exit code is 1', function(done) {
