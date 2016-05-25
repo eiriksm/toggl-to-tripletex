@@ -4,6 +4,10 @@ var mockSpawn = require('mock-spawn');
 var mySpawn = mockSpawn();
 mySpawn.setDefault(mySpawn.simple(1, '', 'test', 'test2'));
 mySpawn.sequence.add(function (cb) {
+  /* eslint-disable quotes */
+  this.stdout.write("\n");
+  this.stderr.write("\n");
+  /* eslint-enable quotes */
   this.stdout.write('a');
   cb();
 });
