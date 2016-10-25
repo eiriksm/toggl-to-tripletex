@@ -43,12 +43,12 @@ function clickDropdown(en, type, hasRow) {
   if (!hasRow) {
     logger(type + ' dropdown ready. Trying to click');
     screenShot(type + 'DropdownReady' + en.id + '-' + en.activity);
-    var delta = 0;
+    var delta = 1;
     if (type == 'activity') {
-      delta = 1;
+      delta = 3;
     }
     casper.evaluate(function(d) {
-      $($($('.newWeeks')[0]).find('.tlxSelectWrapper span')[d]).click();
+      $($($('.newWeeks')[0]).find('.tmdl-tlxSelect input')[d]).click();
     }, delta);
   }
 }
@@ -190,7 +190,7 @@ casper.start('https://tripletex.no/execute/login?site=no', function() {
   screenShot('filled');
 });
 
-casper.waitForSelector('#logoutButton', function() {
+casper.waitForSelector('.tmdl-nav-servicemenu', function() {
   logger('Success logging in');
   screenShot('succlogin');
 }, function err() {
@@ -206,7 +206,7 @@ casper.then(function() {
   // Try to compare what we tried to save to what we have saved.
   var hours = casper.evaluate(function() {
     var day = new Date().getDay() - 1;
-    return parseFloat($($('#ajaxContenthourListTable tr:eq(-1)').find('.hourlistSum')[day]).text().replace(',', '.'));
+    return parseFloat($($('tr.sum').find('.hourlistSum')[day]).text().replace(',', '.'));
   });
   if (hours != opts.duration) {
     logger('Did not save all hours, unfortunately. I am a bad robot, sorry! Duration sent was ' + opts.duration + '. Saved hours was ' + hours);
