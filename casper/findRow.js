@@ -1,7 +1,7 @@
 module.exports = function(casper) {
   var logger = require('./logger')(casper);
   return function(en, state) {
-    state.selector = 'td a[title="' + en.id + ' ' + en.name + '"]';
+    state.selector = 'td a[aria-label="' + en.id + ' ' + en.name + '"]';
     logger('Starting findRow module. Using selector "' + state.selector + '" and activity name "' + en.activity + '"');
     state.hasRow = casper.evaluate(function(selector, activity) {
       var hasNext = false;
