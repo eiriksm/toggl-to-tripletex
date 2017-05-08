@@ -1,4 +1,6 @@
 # toggl-to-tripletex
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/eiriksm/toggl-to-tripletex.svg)](https://greenkeeper.io/)
 Automating my timesheet filling
 
 [![Build Status](https://travis-ci.org/eiriksm/toggl-to-tripletex.svg?branch=master)](https://travis-ci.org/eiriksm/toggl-to-tripletex)
