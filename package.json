@@ -14,7 +14,7 @@
     "coveralls": "^3.0.0",
     "eslint": "^4.1.0",
     "istanbul": "^0.4.2",
-    "mocha": "^3.0.1",
+    "mocha": "^4.0.0",
     "mock-spawn": "^0.2.6",
     "proxyquire": "^1.7.4",
     "should": "^13.0.0"
