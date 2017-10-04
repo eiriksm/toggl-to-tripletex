@@ -6,7 +6,7 @@ module.exports = function(casper) {
     if (!state.hasRow) {
       logger('Trying to insert a new row');
       casper.evaluate(function() {
-        $('th button').click();
+        $('#newRowButton').click();
       });
     }
     else {

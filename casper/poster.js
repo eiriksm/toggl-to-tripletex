@@ -63,6 +63,7 @@ function createRun(entry) {
   var state = {};
   casper.then(require('./findRow')(casper).bind(this, entry, state));
   casper.then(require('./createRowIfNotExists')(casper).bind(this, state));
+  logger('Looking for a selector named .contentTable > .newWeeks (first one) and the fact that it is visible');
   casper.waitFor(function() {
     return state.hasRow || casper.evaluate(function() {
       return $($('.contentTable > .newWeeks')[0]).css('display') != 'none';
@@ -73,6 +74,7 @@ function createRun(entry) {
     logEntryAndScreenshot('No dropdown found to click!', 'waitForDropdownError' + en.id + '-' + en.activity);
   }.bind(this, entry));
   casper.waitFor(function check() {
+    logger('Looking for a selector named .tlxSelectListTable tr and it should be of length > 0');
     return state.hasRow || casper.evaluate(function() {
       return $('.tlxSelectListTable tr').length > 0;
     });
@@ -161,7 +163,7 @@ function createRun(entry) {
         // Click save.
         logger('Trying to click save');
         casper.evaluate(function() {
-          $($('#ajaxContenttoolbarContainer button')[0]).click();
+          $('#ajaxContenttoolbarContainer button.storeAction').click();
         });
       });
       casper.waitFor(function() {
