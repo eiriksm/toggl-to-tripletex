@@ -1,5 +1,4 @@
 'use strict';
-var spawn = require('child_process').spawn;
 var config = require('./config');
 var TogglClient = require('toggl-api');
 var rimraf = require('rimraf');
@@ -8,8 +7,17 @@ var mo = require('moment');
 var entries = {};
 var mappings = config.mappings;
 var totalDuration = 0;
+
+const pup = require('./src/puppeteer')
 module.exports = function(callback) {
-  toggl.getTimeEntries(mo(1, 'h').format(), mo(19, 'h').format(), function(err, data) {
+  var dayOffset = 0;
+  if (process.argv[2]) {
+    dayOffset = process.argv[2]
+  }
+  var moment = mo().subtract(dayOffset, 'days')
+  var from = moment.hour(1).format()
+  var to = moment.hour(23).format()
+  toggl.getTimeEntries(from, to, function(err, data) {
     if (err) {
       return callback(err);
     }
@@ -58,40 +66,13 @@ module.exports = function(callback) {
       callback(error);
       return;
     }
-    // Spawn a process with this as arguments.
-    var p = spawn('casperjs', ['casper/poster.js', JSON.stringify({
-      entries: entries,
+    return pup({
+      entries,
       user: config.texUser,
       pass: config.texPass,
       duration: totalDuration,
-      baseUrl: config.baseUrl
-    })]);
-    var output = [];
-    p.stdout.on('data', function(data) {
-      var stdOutString = data.toString().trim();
-      if (!stdOutString || !stdOutString.length) {
-        return;
-      }
-      output.push(stdOutString);
-    });
-    p.stderr.on('data', function(d) {
-      var stdErrString = d.toString().trim();
-      if (!stdErrString || !stdErrString.length) {
-        return;
-      }
-      output.push('err: ' + d.toString());
-    });
-    p.on('close', function(c) {
-      if (c !== 0) {
-        /* eslint-disable quotes */
-        process.stderr.write(output.join("\n"));
-        callback(new Error('Problematic run detected'));
-        /* eslint-enable quotes */
-      }
-      else {
-        rimraf(__dirname + '/shots/*.png', callback);
-      }
-    });
-
+      baseUrl: config.baseUrl,
+      dayOffset
+    }, callback)
   });
 };

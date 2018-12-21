@@ -4,9 +4,8 @@
   "description": "Automating my timesheet filling",
   "main": "index.js",
   "dependencies": {
-    "casperjs": "^1.1.0-beta5",
     "moment": "^2.11.2",
-    "phantomjs-prebuilt": "^2.1.7",
+    "puppeteer": "^1.11.0",
     "rimraf": "^2.5.2",
     "toggl-api": "^1.0.0"
   },
