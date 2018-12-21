@@ -1,5 +1,5 @@
 module.exports = (user, password) => {
-  window.jQuery('#username').val(user)
-  window.jQuery('#password').val(password)
+  jQuery('#username').val(user)
+  jQuery('#password').val(password)
   jQuery('#loginButton').click()
 }

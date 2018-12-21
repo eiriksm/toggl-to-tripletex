@@ -1,7 +1,6 @@
 'use strict';
 var config = require('./config');
 var TogglClient = require('toggl-api');
-var rimraf = require('rimraf');
 var toggl = new TogglClient({apiToken: config.apiKey});
 var mo = require('moment');
 var entries = {};

@@ -68,7 +68,7 @@ module.exports = async function(entry, page, dayOffset) {
   }
   await clickDropdown(page, entry, 'activity', hasRow);
   await page.waitForFunction((hasRow) => {
-    return hasRow || $('.tlxSelectListTable tr').length > 0
+    return hasRow || $('.tlxSelectListTable tr').length > 0
   }, {
     timeout: 10000
   }, hasRow)
