@@ -3,12 +3,15 @@ function createNewRow() {
 }
 
 function logger() {
-  console.log(arguments)
+  var args = Array.prototype.slice.call(arguments);
+  args.unshift(new Date() + " ");
+  // 3. Pass along arguments to console.log
+  console.log.apply(console, args);
 }
 
 async function clickDropdown(page, en, type, hasRow) {
   if (!hasRow) {
-    console.log(type + ' dropdown ready. Trying to click')
+    logger(type + ' dropdown ready. Trying to click')
     var delta = 1;
     if (type == 'activity') {
       delta = 3;
