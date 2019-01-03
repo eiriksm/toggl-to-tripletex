@@ -34,10 +34,12 @@ function entryHasRow(en, selector) {
 }
 
 module.exports = async function(entry, page, dayOffset) {
+  await page.waitForSelector('#newRowButton')
   let hasRow = await page.evaluate(entryHasRow, entry, createSelector(entry))
   let hasFirstRow = hasRow;
   if (!hasRow) {
-    console.log('Does not have row')
+    logger('Trying to insert a new row')
+    await page.waitForSelector('#newRowButton')
     await page.evaluate(createNewRow)
   }
   await page.waitForFunction((hasRow) => {
@@ -91,36 +93,39 @@ module.exports = async function(entry, page, dayOffset) {
   }
   if (hasFirstRow) {
     var selector = createSelector(entry)
-    await page.evaluate(function(selector, activity, hours, text, dayOffset) {
+    await page.evaluate(function(selector, activity, dayOffset) {
       var delta = new Date().getDay() + 2 - dayOffset;
+      var textInput;
       jQuery(selector).each(function(j, k) {
         if ($(k).closest('td').next().text().trimLeft().indexOf(activity) === 0) {
-          var textInput = $($(k).closest('tr').find('td')[delta]).find('input[type="text"]');
-          textInput.focus();
-          textInput.val(hours)
-            .closest('tr').next().find('textarea')
-            .val(text)
-            .focus()
-            .blur();
+          window.textInput = $($(k).closest('tr').find('td')[delta]).find('input[type="text"]')
         }
-      });
-    }, selector, entry.activity, entry.duration, entry.text, dayOffset);
+      })
+    }, selector, entry.activity, dayOffset);
   }
   else {
-    await page.evaluate(function(id, name, activity, hours, text, dayOffset) {
+    await page.evaluate(function(dayOffset) {
       var delta = new Date().getDay() + 2 - dayOffset;
-      var textInput = $($($('.newWeeks')[0]).find('.hoursRow').find('td')[delta]).find('input[type="text"]');
-      textInput.focus();
-      textInput.val(hours)
-        .closest('tr').next().find('textarea')
-        .val(text)
-        .focus()
-        .blur();
-    }, entry.id, entry.name, entry.activity, entry.duration, entry.text, dayOffset);
+      window.textInput = $($($('.newWeeks')[0]).find('.hoursRow').find('td')[delta]).find('input[type="text"]')
+    }, dayOffset);
   }
-  await page.evaluate(() => {
-    $('#ajaxContenttoolbarContainer button.storeAction').click();
-  })
+
+  let textDataSelector = 'text-selector-' + new Date().getTime();
+  let areaDataSelector = 'area-selector-' + new Date().getTime();
+  await page.evaluate(function(textDataSelector, areaDataSelector) {
+    window.textInput.attr('data-text-selector', textDataSelector)
+    window.areaInput = window.textInput.closest('tr').next().find('textarea')
+    window.areaInput.attr('data-area-selector', areaDataSelector)
+  }, textDataSelector, areaDataSelector);
+  await page.click('[data-text-selector="' + textDataSelector + '"]')
+  await page.evaluate(function (hours) {
+    window.textInput.val(hours)
+  }, entry.duration)
+  await page.click('[data-area-selector="' + areaDataSelector + '"]')
+  await page.evaluate(function (text) {
+    window.areaInput.val(text)
+  }, entry.text)
+  await page.click('#ajaxContenttoolbarContainer button.storeAction')
   await page.waitForFunction(function() {
     return jQuery('.ui-widget-overlay.tlx-overlay').css('display') == 'none';
   });
