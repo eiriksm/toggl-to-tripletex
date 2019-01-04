@@ -93,7 +93,6 @@ module.exports = async function(entry, page, dayOffset) {
     var selector = createSelector(entry)
     await page.evaluate(function(selector, activity, dayOffset) {
       var delta = new Date().getDay() + 2 - dayOffset;
-      var textInput;
       jQuery(selector).each(function(j, k) {
         if ($(k).closest('td').next().text().trimLeft().indexOf(activity) === 0) {
           window.textInput = $($(k).closest('tr').find('td')[delta]).find('input[type="text"]')
