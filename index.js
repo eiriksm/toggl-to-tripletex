@@ -6,6 +6,7 @@ var mo = require('moment');
 var entries = {};
 var mappings = config.mappings;
 var totalDuration = 0;
+const logger = require('./src/logger')
 
 const pup = require('./src/puppeteer')
 module.exports = function(callback) {
@@ -13,7 +14,7 @@ module.exports = function(callback) {
   if (process.argv[2]) {
     dayOffset = process.argv[2]
   }
-  console.log('Starting with offset ', dayOffset)
+  logger('Starting with offset ', dayOffset)
   var moment = mo().subtract(dayOffset, 'days')
   var from = moment.hour(1).format()
   var to = moment.hour(23).format()

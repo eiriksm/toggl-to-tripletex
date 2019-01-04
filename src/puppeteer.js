@@ -1,11 +1,11 @@
 const puppeteer = require('puppeteer')
-
 const login = require('./login')
-
 const createRun = require('./createRun')
+const logger = require('./logger')
 
 module.exports = (config, callback) => {
   (async () => {
+    logger('About to log', config.duration, 'hours')
     var start = 'https://tripletex.no/execute/login?site=no';
     let browser;
     try {

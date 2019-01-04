@@ -1,12 +1,7 @@
+const logger = require('./logger')
+
 function createNewRow() {
   jQuery('#newRowButton').click()
-}
-
-function logger() {
-  var args = Array.prototype.slice.call(arguments);
-  args.unshift(new Date() + " ");
-  // 3. Pass along arguments to console.log
-  console.log.apply(console, args);
 }
 
 async function clickDropdown(page, en, type, hasRow) {
@@ -128,6 +123,7 @@ module.exports = async function(entry, page, dayOffset) {
   await page.evaluate(function (text) {
     window.areaInput.val(text)
   }, entry.text)
+  await page.click('[data-area-selector="' + areaDataSelector + '"]')
   await page.click('#ajaxContenttoolbarContainer button.storeAction')
   await page.waitForFunction(function() {
     return jQuery('.ui-widget-overlay.tlx-overlay').css('display') == 'none';
