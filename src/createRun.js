@@ -122,8 +122,19 @@ module.exports = async function(entry, page, dayOffset) {
   await page.evaluate(function (text) {
     window.areaInput.val(text)
   }, entry.text)
-  await page.click('[data-area-selector="' + areaDataSelector + '"]')
-  await page.click('#ajaxContenttoolbarContainer button.storeAction')
+  // If we first scroll down, and then scroll up, then the button for saving, will always be as expected.
+  await page.evaluate(_ => {
+    document.getElementById('scrollContainer').scrollTop = 500
+  });
+  await page.waitFor(200);
+  await page.evaluate(_ => {
+    document.getElementById('scrollContainer').scrollTop = 0
+  });
+  await page.waitFor(200);
+  await page.waitForSelector('.tlxFloatingHeaderOriginal #ajaxContenttoolbarContainer button.storeAction', {
+    visible: true
+  })
+  await page.click('.tlxFloatingHeaderOriginal #ajaxContenttoolbarContainer button.storeAction')
   await page.waitForFunction(function() {
     return jQuery('.ui-widget-overlay.tlx-overlay').css('display') == 'none';
   });
