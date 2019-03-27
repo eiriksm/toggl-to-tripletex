@@ -66,14 +66,14 @@ module.exports = async function(entry, page, dayOffset) {
       });
     }, entry.id, entry.name);
   }
-  await clickDropdown(page, entry, 'activity', hasRow);
-  await page.waitForFunction((hasRow) => {
-    return hasRow || $('.tlxSelectListTable tr').length > 0
-  }, {
-    timeout: 10000
-  }, hasRow)
   if (!hasRow) {
     if (entry.activity != 1) {
+      await clickDropdown(page, entry, 'activity', hasRow);
+      await page.waitForFunction((hasRow) => {
+        return hasRow || $('.tlxSelectListTable tr').length > 0
+      }, {
+        timeout: 10000
+      }, hasRow)
       logger('Will try to click on the activity list');
       // Add the activity requested. Unless it is 1 (default).
       await page.evaluate(function(activity) {
