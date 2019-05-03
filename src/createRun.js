@@ -32,6 +32,11 @@ function entryHasRow(en, selector) {
 }
 
 module.exports = async function(entry, page, dayOffset) {
+  // Start by just clicking in the body area.
+  await page.evaluate(function() {
+    jQuery('body').click()
+  });
+  logger('Creating run for project name ' + entry.name + ' and text ' + entry.text)
   await page.waitForSelector('#newRowButton')
   let hasRow = await page.evaluate(entryHasRow, entry, createSelector(entry))
   let hasFirstRow = hasRow;
@@ -117,6 +122,7 @@ module.exports = async function(entry, page, dayOffset) {
   await page.click('[data-text-selector="' + textDataSelector + '"]')
   await page.evaluate(function (hours) {
     window.textInput.val(hours)
+    window.textInput.trigger('focus')
   }, entry.duration)
   await page.click('[data-area-selector="' + areaDataSelector + '"]')
   await page.evaluate(function (text) {

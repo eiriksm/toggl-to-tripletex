@@ -13,7 +13,7 @@ module.exports = (config, callback) => {
       const page = await browser.newPage()
       await page.setViewport({
         width: 1280,
-        height: 600
+        height: 300
       })
       // Log in.
       await page.goto(start);
