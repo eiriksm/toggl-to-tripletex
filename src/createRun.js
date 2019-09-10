@@ -72,27 +72,21 @@ module.exports = async function(entry, page, dayOffset) {
     }, entry.id, entry.name);
   }
   if (!hasRow) {
-    if (entry.activity != 1) {
-      await clickDropdown(page, entry, 'activity', hasRow);
-      await page.waitForFunction((hasRow) => {
-        return hasRow || $('.tlxSelectListTable tr').length > 0
-      }, {
-        timeout: 10000
-      }, hasRow)
-      logger('Will try to click on the activity list');
-      // Add the activity requested. Unless it is 1 (default).
-      await page.evaluate(function(activity) {
-        $('.tlxSelectListTable tr').each(function(i, n) {
-          if ($(n).text().indexOf(activity) === 0) {
-            $(n).find('span').click();
-          }
-        });
-      }, entry.activity);
-    }
-    else {
-      logger('Using default activity, because activity is ' + entry.activity);
-    }
-    hasRow = true;
+    await clickDropdown(page, entry, 'activity', hasRow);
+    await page.waitForFunction((hasRow) => {
+      return hasRow || $('.tlxSelectListTable tr').length > 0
+    }, {
+      timeout: 10000
+    }, hasRow)
+    logger('Will try to click on the activity list');
+    // Add the activity requested. Unless it is 1 (default).
+    await page.evaluate(function(activity) {
+      $('.tlxSelectListTable tr').each(function(i, n) {
+        if ($(n).text().indexOf(activity) === 0) {
+          $(n).find('span').click();
+        }
+      });
+    }, entry.activity);
   }
   if (hasFirstRow) {
     var selector = createSelector(entry)
