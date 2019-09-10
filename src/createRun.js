@@ -18,13 +18,13 @@ async function clickDropdown(page, en, type, hasRow) {
 }
 
 function createSelector(en) {
-  return 'td a[aria-label="' + en.id + ' ' + en.name + '"]';
+  return 'td a[title="' + en.id + ' ' + en.name + '"]';
 }
 
 function entryHasRow(en, selector) {
   var hasNext = false;
   jQuery(selector).each(function() {
-    if ($(this).closest('td').next().text().trimLeft().indexOf(en.activity) === 0) {
+    if ($(this).closest('td').next().text().trimLeft().indexOf(en.activity + ' ') === 0) {
       hasNext = true;
     }
   });
