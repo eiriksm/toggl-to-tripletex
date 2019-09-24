@@ -18,7 +18,7 @@ async function clickDropdown(page, en, type, hasRow) {
 }
 
 function createSelector(en) {
-  return 'td a[title="' + en.id + ' ' + en.name + '"]';
+  return 'td a[aria-label="' + en.id + ' ' + en.name + '"]';
 }
 
 function entryHasRow(en, selector) {
@@ -37,6 +37,7 @@ module.exports = async function(entry, page, dayOffset) {
     jQuery('body').click()
   });
   logger('Creating run for project name ' + entry.name + ' and text ' + entry.text)
+  logger('Activity is ' + entry.activity)
   await page.waitForSelector('#newRowButton')
   let hasRow = await page.evaluate(entryHasRow, entry, createSelector(entry))
   let hasFirstRow = hasRow;
@@ -72,21 +73,26 @@ module.exports = async function(entry, page, dayOffset) {
     }, entry.id, entry.name);
   }
   if (!hasRow) {
-    await clickDropdown(page, entry, 'activity', hasRow);
-    await page.waitForFunction((hasRow) => {
-      return hasRow || $('.tlxSelectListTable tr').length > 0
-    }, {
-      timeout: 10000
-    }, hasRow)
-    logger('Will try to click on the activity list');
-    // Add the activity requested. Unless it is 1 (default).
-    await page.evaluate(function(activity) {
-      $('.tlxSelectListTable tr').each(function(i, n) {
-        if ($(n).text().indexOf(activity) === 0) {
-          $(n).find('span').click();
-        }
-      });
+    let activityIsSelected = await page.evaluate(function(activity) {
+      return $($($('.newWeeks')[0]).find('.tmdl-tlxSelect input')[3]).val().indexOf(activity + ' ') === 0;
     }, entry.activity);
+    if (!activityIsSelected) {
+      await clickDropdown(page, entry, 'activity', hasRow);
+      await page.waitForFunction((hasRow) => {
+        return hasRow || $('.tlxSelectListTable tr').length > 0
+      }, {
+        timeout: 10000
+      }, hasRow)
+      logger('Will try to click on the activity list');
+      // Add the activity requested.
+      await page.evaluate(function(activity) {
+        $('.tlxSelectListTable tr').each(function(i, n) {
+          if ($(n).text().indexOf(activity + ' ') === 0) {
+            $(n).find('span').click();
+          }
+        });
+      }, entry.activity);
+    }
   }
   if (hasFirstRow) {
     var selector = createSelector(entry)
