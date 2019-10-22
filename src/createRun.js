@@ -36,7 +36,7 @@ module.exports = async function(entry, page, dayOffset) {
   await page.evaluate(function() {
     jQuery('body').click()
   });
-  logger('Creating run for project name ' + entry.name + ' and text ' + entry.text)
+  logger(entry.duration + ' hours: Creating run for project name ' + entry.name + ' and text ' + entry.text)
   logger('Activity is ' + entry.activity)
   await page.waitForSelector('#newRowButton')
   let hasRow = await page.evaluate(entryHasRow, entry, createSelector(entry))
@@ -125,7 +125,7 @@ module.exports = async function(entry, page, dayOffset) {
     window.textInput.trigger('focus')
   }, entry.duration)
   await page.click('[data-area-selector="' + areaDataSelector + '"]')
-  await page.waitFor(200);
+  await page.waitFor(600);
   await page.evaluate(function (text) {
     window.areaInput.val(text)
   }, entry.text)
