@@ -125,10 +125,11 @@ module.exports = async function(entry, page, dayOffset) {
     window.textInput.trigger('focus')
   }, entry.duration)
   await page.click('[data-area-selector="' + areaDataSelector + '"]')
-  await page.waitFor(600);
+  await page.waitFor(1200);
   await page.evaluate(function (text) {
     window.areaInput.val(text)
   }, entry.text)
+  await page.waitFor(1200);
   // If we first scroll down, and then scroll up, then the button for saving, will always be as expected.
   await page.evaluate(_ => {
     document.getElementById('scrollContainer').scrollTop = 500
