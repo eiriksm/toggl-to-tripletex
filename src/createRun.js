@@ -7,12 +7,12 @@ function createNewRow() {
 async function clickDropdown(page, en, type, hasRow) {
   if (!hasRow) {
     logger(type + ' dropdown ready. Trying to click')
-    var delta = 1;
+    var delta = 0;
     if (type == 'activity') {
-      delta = 3;
+      delta = 1;
     }
     await page.evaluate(function(d) {
-      $($($('.newWeeks')[0]).find('.tmdl-tlxSelect input')[d]).click();
+      $($($('.newWeeks')[0]).find('.tlx-dropdown__react-container .txr-dropdown__field__input')[d]).click();
     }, delta);
   }
 }
@@ -59,22 +59,22 @@ module.exports = async function(entry, page, dayOffset) {
     if (hasRow) {
       return true
     }
-    return $('.tlxSelectListTable tr').length > 0;
+    return $('.txr-dropdown__search-container .txr-dropdown__search-result').length > 0;
   }, {
     timeout: 10000
   }, hasRow)
   if (!hasRow) {
     await page.evaluate(function(id, name) {
-      $('.tlxSelectListTable tr').each(function(i, n) {
+      $('.txr-dropdown__search-container .txr-dropdown__search-result').each(function(i, n) {
         if ($(n).text().indexOf(id + ' ' + name) > -1) {
-          $(n).find('span').click();
+          $(n).find('.txr-dropdown__list-item__text').click();
         }
       });
     }, entry.id, entry.name);
   }
   if (!hasRow) {
     let activityIsSelected = await page.evaluate(function(activity) {
-      return $($($('.newWeeks')[0]).find('.tmdl-tlxSelect input')[3]).val().indexOf(activity + ' ') === 0;
+      return $($($('.newWeeks')[0]).find('.tlx-dropdown__react-container .txr-dropdown__field__input')[1]).text().indexOf(activity + ' ') === 0;
     }, entry.activity);
     if (!activityIsSelected) {
       await clickDropdown(page, entry, 'activity', hasRow);

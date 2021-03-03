@@ -19,7 +19,9 @@ module.exports = (config, callback) => {
       await page.goto(start);
       await page.evaluate(login, config.user, config.pass)
       await page.waitForNavigation()
-      for (const id of Object.keys(config.entries)) {
+      let keys = Object.keys(config.entries)
+      keys = keys.reverse()
+      for (const id of keys) {
         let entry = config.entries[id]
         await createRun(entry, page, config.dayOffset)
       }
