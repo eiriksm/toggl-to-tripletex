@@ -18,6 +18,7 @@ module.exports = (config, callback) => {
       // Log in.
       await page.goto(start);
       await page.evaluate(login, config.user, config.pass)
+      await page.click('#loginButton')
       await page.waitForNavigation()
       let keys = Object.keys(config.entries)
       keys = keys.reverse()

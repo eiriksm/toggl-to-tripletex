@@ -14,6 +14,7 @@ async function clickDropdown(page, en, type, hasRow) {
     await page.evaluate(function(d) {
       $($($('.newWeeks')[0]).find('.tlx-dropdown__react-container .txr-dropdown__field__input')[d]).click();
     }, delta);
+    await page.waitFor(1000);
   }
 }
 
@@ -65,9 +66,9 @@ module.exports = async function(entry, page, dayOffset) {
   }, hasRow)
   if (!hasRow) {
     await page.evaluate(function(id, name) {
-      $('.txr-dropdown__search-container .txr-dropdown__search-result').each(function(i, n) {
+      $('.txr-dropdown__search-container .txr-dropdown__search-result .txr-dropdown__item-cell--description').each(function(i, n) {
         if ($(n).text().indexOf(id + ' ' + name) > -1) {
-          $(n).find('.txr-dropdown__list-item__text').click();
+          $(n).click();
         }
       });
     }, entry.id, entry.name);
@@ -79,16 +80,16 @@ module.exports = async function(entry, page, dayOffset) {
     if (!activityIsSelected) {
       await clickDropdown(page, entry, 'activity', hasRow);
       await page.waitForFunction((hasRow) => {
-        return hasRow || $('.tlxSelectListTable tr').length > 0
+        return $('.txr-dropdown__search-container .txr-dropdown__search-result .txr-dropdown__list-item__text').length > 0;
       }, {
         timeout: 10000
       }, hasRow)
       logger('Will try to click on the activity list');
       // Add the activity requested.
       await page.evaluate(function(activity) {
-        $('.tlxSelectListTable tr').each(function(i, n) {
+        $('.txr-dropdown__search-container .txr-dropdown__search-result .txr-dropdown__list-item__text').each(function(i, n) {
           if ($(n).text().indexOf(activity + ' ') === 0) {
-            $(n).find('span').click();
+            $(n).click();
           }
         });
       }, entry.activity);
