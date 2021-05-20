@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "moment": "^2.11.2",
+    "patch-package": "^6.4.7",
     "puppeteer": "^1.11.0",
     "rimraf": "^2.5.2",
     "toggl-api": "^1.0.0"
@@ -19,6 +20,7 @@
     "should": "^13.0.0"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "start": "node start.js",
     "test": "npm run lint && mocha",
     "lint": "eslint . ",
