@@ -98,7 +98,12 @@ module.exports = async function(entry, page, dayOffset) {
   if (hasFirstRow) {
     var selector = createSelector(entry)
     await page.evaluate(function(selector, activity, dayOffset) {
-      var delta = new Date().getDay() + 2 - dayOffset;
+      var day = new Date().getDay()
+      // well, except sunday should be 7 for this to work.
+      if (!day) {
+        day = 7
+      }
+      var delta = day + 2 - dayOffset;
       jQuery(selector).each(function(j, k) {
         if ($(k).closest('td').next().text().trimLeft().indexOf(activity) === 0) {
           window.textInput = $($(k).closest('tr').find('td')[delta]).find('input[type="text"]')
@@ -108,7 +113,12 @@ module.exports = async function(entry, page, dayOffset) {
   }
   else {
     await page.evaluate(function(dayOffset) {
-      var delta = new Date().getDay() + 2 - dayOffset;
+      var day = new Date().getDay()
+      // well, except sunday should be 7 for this to work.
+      if (!day) {
+        day = 7
+      }
+      var delta = day + 2 - dayOffset;
       window.textInput = $($($('.newWeeks')[0]).find('.hoursRow').find('td')[delta]).find('input[type="text"]')
     }, dayOffset);
   }
