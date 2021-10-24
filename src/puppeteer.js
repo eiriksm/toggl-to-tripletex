@@ -13,13 +13,18 @@ module.exports = (config, callback) => {
       const page = await browser.newPage()
       await page.setViewport({
         width: 1280,
-        height: 300
+        height: 800
       })
       // Log in.
       await page.goto(start);
       await page.evaluate(login, config.user, config.pass)
       await page.click('#loginButton')
       await page.waitForNavigation()
+      await page.waitFor(2000);
+      // This crappy popup is in the way.
+      await page.evaluate(function() {
+        jQuery('.walkme-to-remove > button').click()
+      })
       let keys = Object.keys(config.entries)
       keys = keys.reverse()
       for (const id of keys) {
