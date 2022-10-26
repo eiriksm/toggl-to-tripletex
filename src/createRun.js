@@ -14,11 +14,14 @@ async function clickDropdown(page, en, type, hasRow) {
     await page.evaluate(function(d) {
       $($($('.newWeeks')[0]).find('.tlx-dropdown__react-container .txr-dropdown__field__input')[d]).click();
     }, delta);
-    await page.waitFor(1000);
+    await page.waitForTimeout(1000);
   }
 }
 
 function createSelector(en) {
+  if (!en.id && !en.name) {
+    return 'td'
+  }
   return 'td a[aria-label="' + en.id + ' ' + en.name + '"]';
 }
 
@@ -65,9 +68,16 @@ module.exports = async function(entry, page, dayOffset) {
     timeout: 10000
   }, hasRow)
   if (!hasRow) {
+    var a = 'b'
     await page.evaluate(function(id, name) {
-      $('.txr-dropdown__search-container .txr-dropdown__search-result .txr-dropdown__item-cell--description').each(function(i, n) {
-        if ($(n).text().indexOf(id + ' ' + name) > -1) {
+      var text = id + ' ' + name;
+      var selector = '.txr-dropdown__search-container .txr-dropdown__search-result .txr-dropdown__item-cell--description'
+      if (!id && !name) {
+        text = '(Ikke valgt)';
+        selector = '.txr-dropdown__search-container .txr-dropdown__search-result .txr-dropdown__item-cell--default'
+      }
+      $(selector).each(function(i, n) {
+        if ($(n).text().indexOf(text) > -1) {
           $(n).click();
         }
       });
@@ -97,19 +107,31 @@ module.exports = async function(entry, page, dayOffset) {
   }
   if (hasFirstRow) {
     var selector = createSelector(entry)
-    await page.evaluate(function(selector, activity, dayOffset) {
+    await page.evaluate(function(selector, id, activity, dayOffset) {
       var day = new Date().getDay()
       // well, except sunday should be 7 for this to work.
       if (!day) {
         day = 7
       }
-      var delta = day + 2 - dayOffset;
+      var delta = day + 2 - (dayOffset);
       jQuery(selector).each(function(j, k) {
-        if ($(k).closest('td').next().text().trimLeft().indexOf(activity) === 0) {
+        var $td = $(k).closest('td')
+        if (!id) {
+          $td = $(k);
+          // Also see if the sibling is an empty
+          if (!$td.hasClass('table-cell--text')) {
+            return
+          }
+          var colText = $td.text().trim
+          if (colText.length) {
+            return;
+          }
+        }
+        if ($td.next().text().trimLeft().indexOf(activity + ' ') === 0) {
           window.textInput = $($(k).closest('tr').find('td')[delta]).find('input[type="text"]')
         }
       })
-    }, selector, entry.activity, dayOffset);
+    }, selector, entry.id, entry.activity, dayOffset);
   }
   else {
     await page.evaluate(function(dayOffset) {
@@ -136,25 +158,23 @@ module.exports = async function(entry, page, dayOffset) {
     window.textInput.trigger('focus')
   }, entry.duration)
   await page.click('[data-area-selector="' + areaDataSelector + '"]')
-  await page.waitFor(1200);
+  await page.waitForTimeout(1200);
   await page.evaluate(function (text) {
     window.areaInput.val(text)
   }, entry.text)
-  await page.waitFor(1200);
+  await page.waitForTimeout(1200);
   // If we first scroll down, and then scroll up, then the button for saving, will always be as expected.
   await page.evaluate(_ => {
     document.getElementById('scrollContainer').scrollTop = 500
   });
-  await page.waitFor(200);
+  await page.waitForTimeout(200);
   await page.evaluate(_ => {
     document.getElementById('scrollContainer').scrollTop = 0
   });
-  await page.waitFor(200);
+  await page.waitForTimeout(200);
   await page.waitForSelector('.tlxFloatingHeaderOriginal #ajaxContenttoolbarContainer button.storeAction', {
     visible: true
   })
   await page.click('.tlxFloatingHeaderOriginal #ajaxContenttoolbarContainer button.storeAction')
-  await page.waitForFunction(function() {
-    return jQuery('.ui-widget-overlay.tlx-overlay').css('display') == 'none';
-  });
+  await page.waitForTimeout(1200);
 }

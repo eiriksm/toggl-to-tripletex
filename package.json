@@ -6,7 +6,7 @@
   "dependencies": {
     "moment": "^2.11.2",
     "patch-package": "^6.4.7",
-    "puppeteer": "^1.11.0",
+    "puppeteer": "^13.6.0",
     "rimraf": "^2.5.2",
     "toggl-api": "^1.0.0"
   },

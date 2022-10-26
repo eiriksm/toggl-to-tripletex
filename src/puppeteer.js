@@ -5,6 +5,7 @@ const logger = require('./logger')
 
 module.exports = (config, callback) => {
   (async () => {
+    console.log(config)
     logger('About to log', config.duration, 'hours')
     var start = 'https://tripletex.no/execute/login?site=no';
     let browser;
@@ -19,8 +20,11 @@ module.exports = (config, callback) => {
       await page.goto(start);
       await page.evaluate(login, config.user, config.pass)
       await page.click('#loginButton')
+      await page.waitForTimeout(1000)
+      await page.evaluate(login, config.user, config.pass)
+      await page.click('#loginButton')
       await page.waitForNavigation()
-      await page.waitFor(2000);
+      await page.waitForTimeout(4000);
       // This crappy popup is in the way.
       await page.evaluate(function() {
         jQuery('.walkme-to-remove > button').click()
@@ -32,6 +36,7 @@ module.exports = (config, callback) => {
         await createRun(entry, page, config.dayOffset)
       }
       // Now check if everything was saved.
+      await page.waitForTimeout(2000);
       let hours = await page.evaluate(function(dayOffset) {
         var day = new Date().getDay() - 1 - dayOffset;
         return parseFloat($($('tr.sum').find('.hourlistSum')[day]).text().replace(',', '.'));
