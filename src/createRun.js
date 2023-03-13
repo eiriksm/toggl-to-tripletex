@@ -113,7 +113,11 @@ module.exports = async function(entry, page, dayOffset) {
       if (!day) {
         day = 7
       }
-      var delta = day + 2 - (dayOffset);
+      var weekAdjustment = 0
+      if (day - dayOffset <= 0) {
+        weekAdjustment = 6
+      }
+      var delta = day + 2 - (dayOffset - weekAdjustment);
       jQuery(selector).each(function(j, k) {
         var $td = $(k).closest('td')
         if (!id) {
@@ -140,7 +144,11 @@ module.exports = async function(entry, page, dayOffset) {
       if (!day) {
         day = 7
       }
-      var delta = day + 2 - dayOffset;
+      var weekAdjustment = 0
+      if (day - dayOffset <= 0) {
+        weekAdjustment = 6
+      }
+      var delta = day + 2 - (dayOffset - weekAdjustment);
       window.textInput = $($($('.newWeeks')[0]).find('.hoursRow').find('td')[delta]).find('input[type="text"]')
     }, dayOffset);
   }
