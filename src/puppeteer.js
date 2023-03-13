@@ -20,11 +20,18 @@ module.exports = (config, callback) => {
       await page.goto(start);
       await page.evaluate(login, config.user, config.pass)
       await page.click('#loginButton')
-      await page.waitForTimeout(1000)
-      await page.evaluate(login, config.user, config.pass)
-      await page.click('#loginButton')
-      await page.waitForNavigation()
       await page.waitForTimeout(4000);
+      try {
+        await page.click('#onetrust-accept-btn-handler')
+      }
+      catch(err) {
+      }
+      await page.evaluate(function(pass) {
+        document.querySelector('#Password').value = pass
+      }, config.pass)
+      await page.waitForTimeout(1000);
+      await page.click('#LoginButton')
+      await page.waitForTimeout(6000);
       // This crappy popup is in the way.
       await page.evaluate(function() {
         jQuery('.walkme-to-remove > button').click()
