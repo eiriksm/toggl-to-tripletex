@@ -2,6 +2,7 @@
   "apiKey": "YOUR-TOGGL-API-KEY",
   "texUser": "you@your-company.com",
   "texPass": "YOURTRIPPYTEXPASSWORD",
+  "headless": true,
   "mappings": {
     "TOGGL-PID": {
       "name": "The title of the project in tripletex",
