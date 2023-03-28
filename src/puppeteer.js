@@ -10,7 +10,7 @@ module.exports = (config, callback) => {
     var start = 'https://tripletex.no/execute/login?site=no';
     let browser;
     try {
-      browser = await puppeteer.launch({headless: false})
+      browser = await puppeteer.launch({headless: config.headless})
       const page = await browser.newPage()
       await page.setViewport({
         width: 1280,
