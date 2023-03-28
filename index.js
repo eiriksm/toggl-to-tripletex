@@ -69,6 +69,7 @@ module.exports = function(callback) {
     }
     return pup({
       entries,
+      headless: config.headless,
       user: config.texUser,
       pass: config.texPass,
       duration: totalDuration,
