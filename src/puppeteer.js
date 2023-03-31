@@ -44,6 +44,8 @@ module.exports = (config, callback) => {
       }
       // Now check if everything was saved.
       await page.waitForTimeout(2000);
+      await page.reload()
+      await page.waitForSelector('.hourlistSum')
       let hours = await page.evaluate(function(dayOffset) {
         var day = new Date().getDay() - 1 - dayOffset;
         return parseFloat($($('tr.sum').find('.hourlistSum')[day]).text().replace(',', '.'));
